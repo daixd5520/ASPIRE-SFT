@@ -1,14 +1,10 @@
 # autogen_training_yaml.py
 """
-用法1
-python autogen_training_yaml.py --yaml_prefix '/home/dxd/SFT/LLaMA-Factory/examples/train_lora/Wizard/llama2_7b_lora_sft_Wizard_best_of_5_remove' --model_path '/home/dxd/SFT/models/Llama-2-7b-hf' --data_prefix 'wizard-70k' --remove_count '[4000,12000,20000,28000,34936,38436,41236]' --save_path '/home/dxd/SFT/All-Utils/lora_res_after_choose_data/remove'
+bash:
+python autogen_training_yaml.py --yaml_prefix 'xxx/LLaMA-Factory/examples/train_lora/s1remove' --model_path 'xxx/Llama-2-7b-hf' --data_prefix 'wizard-70k' --remove_count '[4000,12000,20000,28000]' --save_path 'xxx/remove'
 
-"""
-"""
-用法2
+python:
 from autogen_training_yaml import generate_yaml
-
-# 调用 generate_yaml 函数
 generate_yaml(yaml_path, model_path, template, data_path, save_path)
 
 """
@@ -44,7 +40,7 @@ def generate_yaml(yaml_path, model_path, template, data_path, save_path, epo=3.0
             "per_device_train_batch_size": 2,
             "gradient_accumulation_steps": 4,
             "learning_rate": 1.0e-4,
-            "num_train_epochs": epo,  # 直接传递数字类型
+            "num_train_epochs": epo, 
             "lr_scheduler_type": "cosine",
             "warmup_ratio": 0.1,
             "bf16": True,
@@ -58,7 +54,6 @@ def generate_yaml(yaml_path, model_path, template, data_path, save_path, epo=3.0
         }
     }
 
-    # 定义每个部分前的注释
     comments = {
         "model": "### model",
         "method": "### method",
@@ -68,19 +63,15 @@ def generate_yaml(yaml_path, model_path, template, data_path, save_path, epo=3.0
         "eval": "### eval"
     }
 
-    # 初始化 YAML 字符串
     yaml_str = ""
 
-    # 按顺序添加注释和对应的内容
     for section in ["model", "method", "dataset", "output", "train", "eval"]:
         yaml_str += f"{comments[section]}:\n"
-        # 使用缩进来表示层级结构
         section_yaml = yaml.dump(yaml_sections[section], default_flow_style=False, sort_keys=False)
-        # 增加缩进
+        
         indented_section = '\n'.join(['  ' + line if line.strip() else line for line in section_yaml.split('\n')])
         yaml_str += f"{indented_section}\n"
 
-    # 定义文件名
     file_name = f"{yaml_path}.yaml"
     with open(file_name, 'w') as file:
         file.write(yaml_str)
@@ -98,7 +89,7 @@ def generate_yaml_fft(yaml_path, model_path, template, data_path, save_path, epo
             "do_train": True,
             "finetuning_type": "full",
             "enable_liger_kernel": True,
-            # "deepspeed": "/data/d/SFT/train_yamls/deepspeed/ds_z3_config.json"
+            # "deepspeed": "xxx/deepspeed/ds_z3_config.json"
             "deepspeed": "/data/d/SFT/train_yamls/deepspeed/ds_z2_config.json"
 
         },
@@ -120,7 +111,7 @@ def generate_yaml_fft(yaml_path, model_path, template, data_path, save_path, epo
             "per_device_train_batch_size": 1,
             "gradient_accumulation_steps": 1,
             "learning_rate": 1.0e-5,
-            "num_train_epochs": epo,  # 直接传递数字类型
+            "num_train_epochs": epo,  
             "lr_scheduler_type": "cosine",
             "warmup_ratio": 0.1,
             "bf16": True,
@@ -134,7 +125,6 @@ def generate_yaml_fft(yaml_path, model_path, template, data_path, save_path, epo
         }
     }
 
-    # 定义每个部分前的注释
     comments = {
         "model": "### model",
         "method": "### method",
@@ -144,19 +134,15 @@ def generate_yaml_fft(yaml_path, model_path, template, data_path, save_path, epo
         "eval": "### eval"
     }
 
-    # 初始化 YAML 字符串
     yaml_str = ""
 
-    # 按顺序添加注释和对应的内容
     for section in ["model", "method", "dataset", "output", "train", "eval"]:
         yaml_str += f"{comments[section]}:\n"
-        # 使用缩进来表示层级结构
         section_yaml = yaml.dump(yaml_sections[section], default_flow_style=False, sort_keys=False)
-        # 增加缩进
+        
         indented_section = '\n'.join(['  ' + line if line.strip() else line for line in section_yaml.split('\n')])
         yaml_str += f"{indented_section}\n"
 
-    # 定义文件名
     file_name = f"{yaml_path}.yaml"
     with open(file_name, 'w') as file:
         file.write(yaml_str)
