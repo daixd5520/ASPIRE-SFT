@@ -34,7 +34,6 @@ houzhui=["1epo","2epo",""]
 
 from inference import InferencePipeline,InferenceMultiCardPipeline
 NUM=0
-# 配置参数
 print(f"inferring {model_paths[NUM]}")
 infer_output_file = f"../infer_res/fft/{model}{houzhui[NUM]}_{dataset}.pkl"
 infer_checkpoint_dir = f"../infer_res/fft/checkpoints/{model}{houzhui[NUM]}_{dataset}.pkl"
@@ -43,7 +42,6 @@ infer_num_gpus = 1
 data_path=f"../datasets/sft/{dataset}.json"
 infer_data_path = data_path
 
-# 创建InferencePipeline实例并运行推理
 # pipeline = InferenceMultiCardPipeline(model_paths[NUM], infer_output_file, infer_checkpoint_dir, infer_batch_size)
 pipeline = InferencePipeline(model_paths[NUM], infer_output_file, infer_checkpoint_dir, infer_batch_size, infer_num_gpus)
 # pipeline = InferencePipeline('/home/pod/shared-nvme/d/SFT/models/llama2-7b', infer_output_file, infer_checkpoint_dir, infer_batch_size, infer_num_gpus)
