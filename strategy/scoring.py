@@ -8,7 +8,6 @@ import json
 import pickle
 
 def load_model_and_tokenizer(model_name, device):
-    """加载模型和tokenizer"""
     model = AutoModelForSequenceClassification.from_pretrained(
         model_name,
         device_map='auto',
@@ -17,20 +16,17 @@ def load_model_and_tokenizer(model_name, device):
     ).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     
-    # 使用DataParallel支持多卡
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
     
     return model, tokenizer
 
 def load_data(file_path):
-    """加载数据"""
     with open(file_path, 'rb') as f:
         df = pickle.load(f)
     return pd.DataFrame(df)
 
 def load_checkpoint(checkpoint_path):
-    """加载检查点"""
     start_index = 0
     results = []
     if os.path.exists(checkpoint_path):
@@ -41,7 +37,6 @@ def load_checkpoint(checkpoint_path):
     return start_index, results
 
 def save_checkpoint(checkpoint_path, index, results):
-    """保存检查点"""
     checkpoint_data = {
         'index': index,
         'results': results
@@ -50,29 +45,24 @@ def save_checkpoint(checkpoint_path, index, results):
         json.dump(checkpoint_data, f)
 
 def save_results(output_path, results):
-    """保存结果"""
     with open(output_path, 'wb') as f:
         pickle.dump(results, f)
 
 def process_batch(model, tokenizer, batch_df, device):
-    """处理批量数据"""
     prompts = batch_df['Instruction'].tolist()
     responses = batch_df['res'].tolist()
     resp_list = [[{"role": "user", "content": prompt}, {"role": "assistant", "content": response}] for prompt, response in zip(prompts, responses)]
     resp_list = [tokenizer.apply_chat_template(resp, tokenize=False) for resp in resp_list]
     
-    # 将输入张量移动到指定设备
     resp_batch = tokenizer(resp_list, return_tensors="pt", padding=True, truncation=True)
-    resp_batch = {key: value.to(device) for key, value in resp_batch.items()}  # 确保所有张量都在同一设备上
+    resp_batch = {key: value.to(device) for key, value in resp_batch.items()}  
 
     with torch.no_grad():
-        # 使用DataParallel时，直接调用model
         scores = model(resp_batch['input_ids'], attention_mask=resp_batch['attention_mask']).logits[:, 0].tolist()
 
     return scores
 
 def main(args):
-    """主函数"""
     file_path = args.file
     ckp_dir = args.ckp_dir
     output_path = args.out_dir
@@ -95,20 +85,19 @@ def main(args):
 
         scores = process_batch(model, tokenizer, batch_df, device)
 
-        batch_results = []  # 存储当前batch的结果
+        batch_results = [] 
         for i, row in batch_df.iterrows():
             result = {
                 'Index': row['Index'],
                 'Instruction': row['Instruction'],
-                'res得分': scores[i - batch_start]
+                'resScore': scores[i - batch_start]
             }
             results.append(result)
             batch_results.append(result)
 
-        # 打印当前batch的结果
-        print(f"\nBatch {batch_start//batch_size + 1} 结果:")
+        print(f"\nBatch {batch_start//batch_size + 1} result:")
         for res in batch_results:
-            print(f"Index: {res['Index']}, 得分: {res['res得分']:.4f}")
+            print(f"Index: {res['Index']}, score: {res['resScore']:.4f}")
 
         save_checkpoint(checkpoint_path, batch_end, results)
 
