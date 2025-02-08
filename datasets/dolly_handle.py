@@ -25,4 +25,4 @@ with open(input_file_path, "r") as infile:
 with open(output_file_path, "w") as outfile:
     json.dump(converted_data, outfile, indent=4)
 
-print(f"转换完成，结果已保存到 {output_file_path}")
+print(f"Finished. Result saved into {output_file_path}")
