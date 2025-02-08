@@ -26,7 +26,7 @@ for i, file in enumerate(score_files):
             df = pd.DataFrame(df)
         for index, row in df.iterrows():
             idx = row['Index']
-            score = row['res得分']
+            score = row['resScore']
             if idx not in data:
                 data[idx] = {}
             data[idx][houzhui[i]] = score
@@ -75,9 +75,5 @@ with open(f"../datasets/sft/{dataset}_{model}2epo.json", "w") as f:
 with open(f"../datasets/sft/{dataset}_{model}3epo.json", "w") as f:
     json.dump(data_3epo, f, indent=4)
 
-# 输出三个文件的数据行数
-# print(f"../datasets/sft/{dataset}_{model}1epo.json 行数: {len(data_1epo)}")
-# print(f"../datasets/sft/{dataset}_{model}2epo.json 行数: {len(data_2epo)}")
-# print(f"../datasets/sft/{dataset}_{model}3epo.json 行数: {len(data_3epo)}")
 
-print("ASPIRE-D数据生成完成!")
+print("ASPIRE-D data has been generated!")
