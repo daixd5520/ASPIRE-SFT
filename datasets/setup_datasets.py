@@ -15,7 +15,6 @@ def run_command(command, description):
 def main():
     download_path = "./sft/"
     
-    # 确保下载路径存在
     if not os.path.exists(download_path):
         os.makedirs(download_path)
 
